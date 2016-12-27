@@ -19,6 +19,8 @@ public class Window extends JFrame {
 	private static JButton update = new JButton("Update");
 	private static JButton storedProcedure = new JButton("Stored Procedure");
 	private static JTextArea textArea = new JTextArea(20, 20);
+	private static JFileChooser fileChoser = new JFileChooser();
+
 	private JScrollPane textField = new JScrollPane(textArea);
 
 	public Window() {
@@ -37,6 +39,12 @@ public class Window extends JFrame {
 		add(textField, BorderLayout.NORTH);
 	}
 
+
+	
+	public void actionPerformed(ActionEvent e) {
+	    //Handle open button action.
+		fileChoser.ShowOpenDialog(FileChooserDemo.this);
+	}
 	public class SelectActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {

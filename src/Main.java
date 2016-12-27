@@ -19,8 +19,6 @@ public class Main {
 		verificator=new Verificator();
 		manager=new XLSManager();
 		Window window=new Window();
-		window.setVisible(true);
-		window.pack();
 		Account account=manager.CreateAccount("D://Downloads//1 (2).xls");
         ArrayList<String> Errors=verificator.Verificate(account);
         for(String str:Errors)

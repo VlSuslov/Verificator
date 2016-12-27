@@ -17,7 +17,7 @@ public class XLSManager implements IManager{
 			fis = new FileInputStream(excel);
 
 			HSSFWorkbook workbook = new HSSFWorkbook(fis);
-		    HSSFSheet sheet = workbook.getSheet("Лист1");
+		    HSSFSheet sheet = workbook.getSheetAt(0);
 		    HSSFRow row=sheet.getRow(0);
 		    account.firstName=row.getCell(0).getStringCellValue();
 		    account.lastName=row.getCell(1).getStringCellValue();
