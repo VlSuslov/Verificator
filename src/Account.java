@@ -1,4 +1,8 @@
-
+/**
+ * 
+ * Класс инкапсулирующий данные аккаунта
+ *
+ */
 public class Account {
 	public String firstName;
 	public String lastName;

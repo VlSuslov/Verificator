@@ -1,11 +1,16 @@
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
+/**
+  * 
+  * Интерфейс модуля отвечающего за верификацию аккаунта
+  *
+  */
 public interface IVerificator {
-	public ArrayList<String> Verificate(Account account) throws ParserConfigurationException, SAXException, IOException;
+	/**
+	 * 
+	 * @param account проверяемый объект Account
+	 * @return cписок найденых ошибок
+	 */
+	public ArrayList<String> Verificate(Account account);
 
 }

@@ -1,17 +1,11 @@
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
-
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.xml.sax.SAXException;
+
 
 public class Window extends JFrame {
 
@@ -19,50 +13,31 @@ public class Window extends JFrame {
 	private static JButton verificate = new JButton("Verificate");
 	private static JTextArea textArea = new JTextArea(20, 20);
 	private static JLabel pathLabel = new JLabel("");
-
 	private String filePath;
-	static IVerificator verificator;
-	static IManager manager;
+	private static IVerificator verificator;
+	private static IManager manager;
 	private JScrollPane textField = new JScrollPane(textArea);
 
+	//GUI проекта
 	public Window() {
 		super("Verificator");
 		setBounds(800, 400, 600, 420);
-		setLayout(null); 
+		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel buttonsPanel = new JPanel();
 		selectFile.addActionListener(new SelectFileActionListener());
 		verificate.addActionListener(new VerificateActionListener());
 		buttonsPanel.add(selectFile);
 		buttonsPanel.add(verificate);
-		pathLabel.setBounds(10,0,500,20);
+		pathLabel.setBounds(10, 0, 500, 20);
 		add(pathLabel);
-		//.setBounds(20, 20, 200, 25);
-		textField.setBounds(10,30,550,300);
+		textField.setBounds(10, 30, 550, 300);
 		add(textField);
-		//.setBounds(20, 50, 400, 100);
-		//add(textField);
-		//.setSize(100, 100);
-		buttonsPanel.setBounds(150,330,200,50);
+		buttonsPanel.setBounds(150, 330, 200, 50);
 		add(buttonsPanel);
-		//.setBounds(20, 200, 400, 50);
-	
-		try {
-			verificator = new Verificator();
-			manager = new XLSManager();
-		} catch (ParserConfigurationException e) {
-			textArea.setText(e.getMessage());
-		} catch (SAXException e) {
-			textArea.setText(e.getMessage());
-		} catch (IOException e) {
-			textArea.setText(e.getMessage());
-		} catch (SpecificationException e) {
-			textArea.setText(e.getMessage());
-		}
 	}
 
 	public class SelectFileActionListener implements ActionListener {
-
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser openFile = new JFileChooser();
 			int returnVal = openFile.showOpenDialog(null);

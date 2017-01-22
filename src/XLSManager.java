@@ -6,10 +6,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 /**
- * 
- * 
  * класс для создания экземпляра Account из файла
- * 
  */
 public class XLSManager implements IManager {
 
