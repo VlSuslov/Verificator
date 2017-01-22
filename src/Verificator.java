@@ -1,170 +1,206 @@
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+/**
+ * 
+ * класс для верификации объекта Account
+ * 
+ */
 public class Verificator implements IVerificator {
 
-	Element firstName;
-	Element lastName;
-	Element emailProviders;
-	Element phones;
-	Element departments;
-	Element firstNameEN;
-	Element lastNameEN;
-	String fieldsPath;
-	String domensPath;
-	ArrayList<Element> domens;
+	private Element firstName;
+	private Element lastName;
+	private ArrayList<Element> emailProviders;
+	private ArrayList<Element> phones;
+	private ArrayList<Element> departments;
+	private Node firstNameEN;
+	private Node lastNameEN;
+	private String fieldsPath;
 
-	Verificator() throws ParserConfigurationException, SAXException, IOException {
-		fieldsPath = "D://specification.xml";
-		domensPath = "D://domens.xml";
+	/**
+	 * 
+	 * Создает экземпляр объекта и проверяет на корректность файл
+	 * specification.xml
+	 * 
+	 * @throws SpecificationException-Если
+	 *             есть нарушение в требованиях к структуре файла
+	 *             specification.xml
+	 * @throws ParserConfigurationException-if
+	 *             a DocumentBuilder cannot be created which satisfies the
+	 *             configuration requested.
+	 * @throws SAXException-If
+	 *             any parse errors occur.
+	 * @throws IOException-If
+	 *             any IO errors occur.
+	 */
+	Verificator() throws ParserConfigurationException, SAXException, IOException, SpecificationException {
+		emailProviders = new ArrayList<Element>();
+		phones = new ArrayList<Element>();
+		departments = new ArrayList<Element>();
+		fieldsPath = "specification.xml";
 		fillFilds();
-		fillDomens();
 	}
 
-	void fillFilds() {
+	private void fillFilds() throws ParserConfigurationException, SAXException, IOException, SpecificationException {
 		DocumentBuilder documentBuilder;
-
-		try {
-			documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document document = documentBuilder.parse(fieldsPath);
-			Element root = document.getDocumentElement();
-			firstName = (Element) root.getElementsByTagName("firstName").item(0);
-			lastName = (Element) root.getElementsByTagName("lastName").item(0);
-			emailProviders = (Element) root.getElementsByTagName("email-providers");
-			phones = (Element) root.getElementsByTagName("phones");
-			departments = (Element) root.getElementsByTagName("departmens");
-			firstNameEN = (Element) root.getElementsByTagName("firstNameEN").item(0);
-			lastNameEN = (Element) root.getElementsByTagName("lastNameEN").item(0);
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	void fillDomens() {
-		DocumentBuilder documentBuilder;
-		try {
-			documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document document = documentBuilder.parse(domensPath);
-			Element root = document.getDocumentElement();
-			NodeList element = root.getElementsByTagName("domens");
-			for (int i = 0; i < element.getLength(); i++) {
-				// domens.add(element.item(i).getNodeValue());
-			}
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public ArrayList<String> Verificate(Account account)
-			throws ParserConfigurationException, SAXException, IOException {
-		ArrayList<String> Errors = new ArrayList<String>();
-		DocumentBuilder documentBuilder;
+		NodeList nodes;
+		Element bufElement;
 		documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = documentBuilder.parse(fieldsPath);
 		Element root = document.getDocumentElement();
-		if (!Pattern.matches(firstName.getNodeValue(), account.firstName))
-			Errors.add("Некорректное поле " + firstName.getAttribute("name"));
-		if (!Pattern.matches(lastName.getNodeValue(), account.lastName))
-			Errors.add("Некорректное поле " + lastName.getAttribute("name"));
-		String defaultEmail = ((Element) emailProviders.getElementsByTagName("default").item(0)).getNodeValue();
+		firstName = (Element) root.getElementsByTagName("firstName").item(0);
+		if (firstName == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг firstName");
+		if (firstName.getTextContent().trim() == "")
+			throw new SpecificationException("В файле specification.xml тэг firstName не содержит значение");
+		lastName = (Element) root.getElementsByTagName("lastName").item(0);
+		if (lastName == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг lastName");
+		if (lastName.getTextContent().trim() == "")
+			throw new SpecificationException("В файле specification.xml тэг lastName не содержит значение");
+		bufElement = (Element) root.getElementsByTagName("email-providers").item(0);
+		if (bufElement == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг email-providers");
+		nodes = bufElement.getChildNodes();
+		if (nodes == null)
+			throw new SpecificationException("В файле specification.xml тэг email-providers не имеет вложенных тэгов");
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				bufElement = (Element) nodes.item(i);
+				if (bufElement.getTextContent().trim() == "")
+					throw new SpecificationException("В файле specification.xml тэг " + bufElement.getNodeName()
+							+ " c именем " + bufElement.getAttributes().getNamedItem("name").getNodeValue()
+							+ " не содержит значение");
+				else
+					emailProviders.add((Element) nodes.item(i));
+			}
+		}
+		bufElement = (Element) root.getElementsByTagName("phones").item(0);
+		nodes = bufElement.getChildNodes();
+		if (nodes == null)
+			throw new SpecificationException("В файле specification.xml тэг phones не имеет вложенных тэгов");
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				bufElement = (Element) nodes.item(i);
+				if (bufElement.getTextContent().trim() == "")
+					throw new SpecificationException("В файле specification.xml тэг " + bufElement.getNodeName()
+							+ " c именем " + bufElement.getAttributes().getNamedItem("name").getNodeValue()
+							+ " не содержит значение");
+				else
+					phones.add((Element) nodes.item(i));
+			}
+		}
+		bufElement = (Element) root.getElementsByTagName("departments").item(0);
+		nodes = bufElement.getChildNodes();
+		if (nodes == null)
+			throw new SpecificationException("В файле specification.xml тэг departments не имеет вложенных тэгов");
+		for (int i = 0; i < nodes.getLength(); i++) {
+			if (nodes.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				bufElement = (Element) nodes.item(i);
+				if (bufElement.getTextContent().trim() == "")
+					throw new SpecificationException("В файле specification.xml тэг " + bufElement.getNodeName()
+							+ " c именем " + bufElement.getAttributes().getNamedItem("name").getNodeValue()
+							+ " не содержит значение");
+				else
+					departments.add((Element) nodes.item(i));
+			}
+		}
+		firstNameEN = root.getElementsByTagName("firstNameEN").item(0);
+		if (firstNameEN == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг firstNameEN");
+		if (firstNameEN.getTextContent().trim() == "")
+			throw new SpecificationException("В файле specification.xml тэг firstNameEN не содержит значение");
+		lastNameEN = root.getElementsByTagName("lastNameEN").item(0);
+		if (lastNameEN == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг lastNameEN");
+		if (lastNameEN.getTextContent().trim() == "")
+			throw new SpecificationException("В файле specification.xml тэг lastNameEN не содержит значение");
+	}
+
+	/**
+	 * Проверяет объект Account на корректность по правилам описанным в файле
+	 * specification.xml
+	 * 
+	 * @param account проверяемый объект Account
+	 * @return cписок найденых ошибок
+	 */
+	public ArrayList<String> Verificate(Account account) {
+		ArrayList<String> Errors = new ArrayList<String>();
+		String str = firstName.getTextContent().trim();
+		if (!Pattern.matches(str, account.firstName))
+			Errors.add("Некорректное поле First Name");
+		if (!Pattern.matches(lastName.getTextContent().trim(), account.lastName))
+			Errors.add("Некорректное поле Last Name");
+		String defaultEmail = emailProviders.get(0).getTextContent().trim();
 		if (!Pattern.matches(defaultEmail, account.email))
 			Errors.add("Некорректное поле Secondary Email");
 		else {
-
 			Element provider;
 			String domen;
 			int position = account.email.indexOf("@");
 			if (position > 0 && position < account.email.length() - 2) {
 				String accountDomen = account.email.substring(position + 1, account.email.length() - 1);
 				boolean fit = false;
-				int count = emailProviders.getElementsByTagName("email-provider").getLength();
-				for (int i = 0; i < count; i++) {
-					provider = (Element) emailProviders.getElementsByTagName("email-provider").item(i);
+				for (int i = 1; i < emailProviders.size(); i++) {
+					provider = emailProviders.get(i);
 					domen = provider.getAttribute("domen");
 					if (domen.equals(accountDomen)) {
-						if (Pattern.matches(provider.getNodeValue(), account.email)) {
+						if (Pattern.matches(provider.getTextContent().trim(), account.email)) {
 							fit = true;
 							break;
 						}
 					}
 				}
-				if (!fit) 
+				if (!fit)
 					Errors.add("Email-provider не относиться к рекомендуемым или проверенным");
 			}
 		}
 		{
-			Element phone;
 			boolean fit = false;
-			int count = phones.getElementsByTagName("phone").getLength();
+			int count = phones.size();
 			for (int i = 0; i < count; i++) {
-				phone = (Element) phones.getElementsByTagName("phone").item(i);
-				if (Pattern.matches(phone.getNodeValue(), account.phone)) {
+				if (Pattern.matches(phones.get(i).getTextContent().trim(), account.phone)) {
 					fit = true;
 					break;
 				}
 			}
-			if(!fit)
-				Errors.add("Некорректное поле "+phones.getAttribute("name"));
+			if (!fit)
+				Errors.add("Некорректное поле Phones");
 		}
 		{
-			Element department;
 			boolean fit = false;
-			int count = departments.getElementsByTagName("department").getLength();
-			for (int i = 0; i < count; i++) {
-				department = (Element) departments.getElementsByTagName("department").item(i);
-				if (Pattern.matches(department.getNodeValue(), account.department)) {
+			int count = departments.size();
+			for (int i = 1; i < count; i++) {
+				if (Pattern.matches(departments.get(i).getTextContent().trim(), account.department)) {
 					fit = true;
 					break;
 				}
 			}
-			if(!fit)
-			{
-				department=(Element) departments.getElementsByTagName("default").item(0);
-				if (!Pattern.matches(department.getNodeValue(), account.department)) 
-				{
-					Errors.add("Некорректное поле "+departments.getAttribute("name"));
-				}
-				else
-				{
-					count=departments.getElementsByTagName("department").getLength();
-					String list="";
-							for(int i=0;i<count;i++)
-							{
-								department=(Element)departments.getElementsByTagName("department").item(i);
-								list+=department.getAttribute("name")+" ,";
+			if (!fit) {
+				if (Pattern.matches(departments.get(0).getTextContent().trim(), account.department)) {
+					count = departments.size();
+					String list = "";
+					if (count > 1) {
+						list += departments.get(1).getAttribute("name");
+						if (count > 2) {
+							for (int i = 2; i < count; i++) {
+								list += "," + departments.get(i).getAttribute("name");
 							}
-					Errors.add("Поле "+departments.getAttribute("name")+" не относиться к "+list);
-				}
+						}
+						Errors.add("Поле Department не относиться к таким рекомендуемым шаблонам как: " + list);
+					}
+				} else
+					Errors.add("Некорректное поле Department");
 			}
-				Errors.add("Некорректное поле"+departments.getAttribute("name"));
-		}		
-		if (!Pattern.matches(firstNameEN.getNodeValue(), account.firstNameEN))
-			Errors.add("Некорректное поле"+firstNameEN.getAttribute("name"));
-		if (!Pattern.matches(lastNameEN.getNodeValue(), account.lastNameEN))
-			Errors.add("Некорректное поле "+lastNameEN.getAttribute("name"));
+		}
+		if (!Pattern.matches(firstNameEN.getTextContent().trim(), account.firstNameEN))
+			Errors.add("Некорректное поле First Name EN");
+		if (!Pattern.matches(lastNameEN.getTextContent().trim(), account.lastNameEN))
+			Errors.add("Некорректное поле Last Name EN");
 		return Errors;
 	}
-
 }

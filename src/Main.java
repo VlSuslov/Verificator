@@ -14,18 +14,10 @@ public class Main {
 	static IVerificator verificator;
 	static IManager manager;
 
-	public static void main (String[] args) throws IOException, ParserConfigurationException, SAXException 
+	public static void main (String[] args) throws IOException, ParserConfigurationException, SAXException, SpecificationException 
 	{
-		verificator=new Verificator();
-		manager=new XLSManager();
 		Window window=new Window();
-		Account account=manager.CreateAccount("D://Downloads//1 (2).xls");
-        ArrayList<String> Errors=verificator.Verificate(account);
-        for(String str:Errors)
-        {
-        	System.out.println(str);
-        }
-	    }
-	
+		window.setVisible(true);
+	}	
 
 }
