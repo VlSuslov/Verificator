@@ -1,4 +1,7 @@
+package verificator.managers;
+
 import java.io.IOException;
+import verificator.Account;
 /**
  * 
  * Интерфейс модуля отвечающего за создание объекта аккаунта из файла

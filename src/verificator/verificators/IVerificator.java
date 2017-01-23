@@ -1,4 +1,6 @@
+package verificator.verificators;
 import java.util.ArrayList;
+import verificator.Account;
 
 /**
   * 

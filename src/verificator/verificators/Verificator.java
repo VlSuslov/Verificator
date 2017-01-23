@@ -1,9 +1,12 @@
+package verificator.verificators;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+import verificator.Account;
 
 /**
  * 
@@ -37,7 +40,7 @@ public class Verificator implements IVerificator {
 	 * @throws IOException-If
 	 *             any IO errors occur.
 	 */
-	Verificator() throws ParserConfigurationException, SAXException, IOException, SpecificationException {
+	public Verificator() throws ParserConfigurationException, SAXException, IOException, SpecificationException {
 		emailProviders = new ArrayList<Element>();
 		phones = new ArrayList<Element>();
 		departments = new ArrayList<Element>();

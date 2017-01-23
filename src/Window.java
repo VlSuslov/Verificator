@@ -5,6 +5,9 @@ import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+import verificator.Account;
+import verificator.managers.*;
+import verificator.verificators.*;
 
 
 public class Window extends JFrame {
@@ -12,10 +15,13 @@ public class Window extends JFrame {
 	private static JButton selectFile = new JButton("SelectFile");
 	private static JButton verificate = new JButton("Verificate");
 	private static JTextArea textArea = new JTextArea(20, 20);
+	/**
+	 * 
+	 */
 	private static JLabel pathLabel = new JLabel("");
 	private String filePath;
-	private static IVerificator verificator;
-	private static IManager manager;
+	private IVerificator verificator;
+	private IManager manager;
 	private JScrollPane textField = new JScrollPane(textArea);
 
 	//GUI проекта

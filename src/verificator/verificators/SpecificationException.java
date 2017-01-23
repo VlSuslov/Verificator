@@ -1,3 +1,4 @@
+package verificator.verificators;
 /**
  * 
  * Представляет ошибки найденные в файле спецификации specification.xml
