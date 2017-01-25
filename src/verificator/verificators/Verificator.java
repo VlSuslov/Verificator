@@ -7,6 +7,7 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import verificator.Account;
+import verificator.similarity_checkers.*;
 
 /**
  * 
@@ -18,11 +19,13 @@ public class Verificator implements IVerificator {
 	private Element firstName;
 	private Element lastName;
 	private ArrayList<Element> emailProviders;
+	private int similarityCoefficient;
 	private ArrayList<Element> phones;
 	private ArrayList<Element> departments;
-	private Node firstNameEN;
-	private Node lastNameEN;
+	private Element firstNameEN;
+	private Element lastNameEN;
 	private String fieldsPath;
+	private ISimilarityChecker checker;
 
 	/**
 	 * 
@@ -44,6 +47,7 @@ public class Verificator implements IVerificator {
 		emailProviders = new ArrayList<Element>();
 		phones = new ArrayList<Element>();
 		departments = new ArrayList<Element>();
+		checker = new LevenshteinSimilarityChecker();
 		fieldsPath = "specification.xml";
 		fillFilds();
 	}
@@ -82,6 +86,19 @@ public class Verificator implements IVerificator {
 					emailProviders.add((Element) nodes.item(i));
 			}
 		}
+		Element Coefficient = (Element) root.getElementsByTagName("similarityCoefficient").item(0);
+		if (Coefficient == null)
+			throw new SpecificationException("В файле specification.xml отсутствует тэг similarityCoefficient");
+		String value = Coefficient.getTextContent().trim();
+		if (value == "")
+			throw new SpecificationException(
+					"В файле specification.xml тэг similarityCoefficient не содержит значение");
+		try {
+			similarityCoefficient=Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			throw new SpecificationException(
+					"В файле specification.xml тэг similarityCoefficient содержит некорректное значение");
+		}
 		bufElement = (Element) root.getElementsByTagName("phones").item(0);
 		nodes = bufElement.getChildNodes();
 		if (nodes == null)
@@ -112,12 +129,12 @@ public class Verificator implements IVerificator {
 					departments.add((Element) nodes.item(i));
 			}
 		}
-		firstNameEN = root.getElementsByTagName("firstNameEN").item(0);
+		firstNameEN = (Element) root.getElementsByTagName("firstNameEN").item(0);
 		if (firstNameEN == null)
 			throw new SpecificationException("В файле specification.xml отсутствует тэг firstNameEN");
 		if (firstNameEN.getTextContent().trim() == "")
 			throw new SpecificationException("В файле specification.xml тэг firstNameEN не содержит значение");
-		lastNameEN = root.getElementsByTagName("lastNameEN").item(0);
+		lastNameEN = (Element) root.getElementsByTagName("lastNameEN").item(0);
 		if (lastNameEN == null)
 			throw new SpecificationException("В файле specification.xml отсутствует тэг lastNameEN");
 		if (lastNameEN.getTextContent().trim() == "")
@@ -128,7 +145,8 @@ public class Verificator implements IVerificator {
 	 * Проверяет объект Account на корректность по правилам описанным в файле
 	 * specification.xml
 	 * 
-	 * @param account проверяемый объект Account
+	 * @param account
+	 *            проверяемый объект Account
 	 * @return cписок найденых ошибок
 	 */
 	public ArrayList<String> Verificate(Account account) {
@@ -144,22 +162,34 @@ public class Verificator implements IVerificator {
 		else {
 			Element provider;
 			String domen;
+			String similar=null;
 			int position = account.email.indexOf("@");
 			if (position > 0 && position < account.email.length() - 2) {
-				String accountDomen = account.email.substring(position + 1, account.email.length() - 1);
+				String accountDomen = account.email.substring(position + 1, account.email.length());
 				boolean fit = false;
 				for (int i = 1; i < emailProviders.size(); i++) {
 					provider = emailProviders.get(i);
-					domen = provider.getAttribute("domen");
+					domen=provider.getAttribute("domen");
 					if (domen.equals(accountDomen)) {
 						if (Pattern.matches(provider.getTextContent().trim(), account.email)) {
 							fit = true;
 							break;
 						}
 					}
+					else{
+						int similarity=checker.compare(domen, accountDomen);
+						if(similarity<=similarityCoefficient)
+							if(similar!=null)
+								similar+=","+account.email.substring(0,position)+domen;
+							else
+								similar=account.email.substring(0,position+1)+domen;
+					}
 				}
-				if (!fit)
+				if (!fit) {
 					Errors.add("Email-provider не относиться к рекомендуемым или проверенным");
+					if(similar!=null)
+					Errors.add("Возможно вы имели в виду "+similar+" ?");
+				}
 			}
 		}
 		{
@@ -205,5 +235,15 @@ public class Verificator implements IVerificator {
 		if (!Pattern.matches(lastNameEN.getTextContent().trim(), account.lastNameEN))
 			Errors.add("Некорректное поле Last Name EN");
 		return Errors;
+	}
+
+	private ArrayList<String> getDomens() {
+		Element provider;
+		ArrayList<String> domens = new ArrayList<String>();
+		for (int i = 1; i < emailProviders.size(); i++) {
+			provider = emailProviders.get(i);
+			domens.add(provider.getAttribute("domen"));
+		}
+		return domens;
 	}
 }

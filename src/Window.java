@@ -51,6 +51,7 @@ public class Window extends JFrame {
 				File file = openFile.getSelectedFile();
 				filePath = file.getPath();
 				pathLabel.setText(filePath);
+		
 			}
 		}
 	}
