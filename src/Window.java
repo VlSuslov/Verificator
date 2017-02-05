@@ -65,8 +65,9 @@ public class Window extends JFrame {
 					Account account;
 					account = manager.CreateAccount(filePath);
 					ArrayList<String> Errors = verificator.Verificate(account);
+					textArea.setText("");
 					for (String str : Errors)
-						try {
+						try {							
 							textArea.getDocument().insertString(textArea.getDocument().getLength(), str + "\n", null);
 						} catch (BadLocationException e1) {
 							textArea.setText(e1.getMessage());
