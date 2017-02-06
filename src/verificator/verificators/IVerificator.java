@@ -1,6 +1,5 @@
 package verificator.verificators;
 import java.util.ArrayList;
-import verificator.Account;
 
 /**
   * 
@@ -10,9 +9,9 @@ import verificator.Account;
 public interface IVerificator {
 	/**
 	 * 
-	 * @param account проверяемый объект Account
+	 * @param column проверяемые поля аккаунтов
+	 * @param data название проверяемого поля
 	 * @return cписок найденых ошибок
 	 */
-	public ArrayList<String> Verificate(Account account);
-
+	public ArrayList<String> Verificate(String column,ArrayList<String> data);
 }

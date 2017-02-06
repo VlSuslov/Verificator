@@ -1,18 +1,23 @@
 package verificator.managers;
 
 import java.io.IOException;
-import verificator.Account;
+import java.util.ArrayList;
+import java.util.Dictionary;
+
 /**
  * 
- * Интерфейс модуля отвечающего за создание объекта аккаунта из файла
+ * Интерфейс модуля отвечающего за считывания данных аккаунтов из файла
  *
  */
 public interface IManager {
 	/**
+	 * Создает экземпляр словаря из соответсвующих значений аккаунтов по каждому полю из заданного файла
 	 * 
-	 * @param file Путь к файлу в формате XLS содержащему требуемые данные
-	 * @return заполненный из файла объект Account
-	 * @throws IOException-если требуемое поле пусто
+	 * @param file
+	 *            Путь к файлу в формате XLS содержащему требуемые данные
+	 * @return Словарь из соответсвующих значений аккаунтов по каждому полю
+	 * @throws IOException-если
+	 *             требуемое поле пусто
 	 */
-	public Account CreateAccount(String file) throws IOException;
+	public Dictionary<String, ArrayList<String>> getAccountsData(String file) throws IOException;
 }
