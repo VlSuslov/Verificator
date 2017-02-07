@@ -1,6 +1,9 @@
-import java.awt.event.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
 
@@ -26,24 +29,19 @@ public class Window extends JFrame {
 	private IManager manager;
 	private JScrollPane textField = new JScrollPane(textArea);
 
-	// GUI проекта
+	// GUI РїСЂРѕРµРєС‚Р°
 	public Window() {
 		super("Verificator");
 		setBounds(800, 400, 700, 420);
 		setLayout(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel buttonsPanel = new JPanel();
-		String[] fields = { "First Name", "Last Name", "Mobile Phone", "Secondary Email", "Department", "First Name EN",
-				"Last Name EN" };
-		comboBox = new JComboBox(fields);
 		selectFile.addActionListener(new SelectFileActionListener());
 		verificate.addActionListener(new VerificateActionListener());
 		buttonsPanel.add(selectFile);
 		buttonsPanel.add(verificate);
 		pathLabel.setBounds(10, 0, 500, 20);
 		add(pathLabel);
-		comboBox.setBounds(560, 10, 100, 20);
-		add(comboBox);
 		textField.setBounds(10, 30, 650, 300);
 		add(textField);
 		buttonsPanel.setBounds(230, 330, 200, 50);
@@ -58,7 +56,20 @@ public class Window extends JFrame {
 				File file = openFile.getSelectedFile();
 				filePath = file.getPath();
 				pathLabel.setText(filePath);
-
+				manager = new XLSManager();
+				Dictionary<String, ArrayList<String>> AccountsData;
+				try {
+					AccountsData = manager.getAccountsData(filePath);
+					Enumeration<String> keys = AccountsData.keys();
+			        ArrayList<String> arraykeys = Collections.list(keys);
+			        String[] stockArr = new String[arraykeys.size()];
+			        stockArr = arraykeys.toArray(stockArr);
+					comboBox=new JComboBox(stockArr);
+					comboBox.setBounds(460, 10, 200, 20);
+					add(comboBox);
+				} catch (IOException e1) {
+					textArea.setText(e1.getMessage());
+				}				
 			}
 		}
 	}
@@ -70,7 +81,7 @@ public class Window extends JFrame {
 					verificator = new Verificator();
 					manager = new XLSManager();
 					Dictionary<String, ArrayList<String>> AccountsData = manager.getAccountsData(filePath);
-					String selected = (String) comboBox.getSelectedItem();
+					String selected = (String) comboBox.getSelectedItem();	
 					Enumeration<String> keys = AccountsData.keys();
 					while (keys.hasMoreElements()) {
 						String key = keys.nextElement();
@@ -81,23 +92,23 @@ public class Window extends JFrame {
 					}
 					ArrayList<String> column = AccountsData.get(selected);
 					if (column != null) {
-						ArrayList<String> Errors = new ArrayList<String>();
+						ArrayList<String[]> Errors = new ArrayList<String[]>();
 						Errors = verificator.Verificate(selected, column);
 						if (Errors.size() != 0) {
 							textArea.setText("");
-							for (String str : Errors)
-								try {
-									textArea.getDocument().insertString(textArea.getDocument().getLength(), str + "\n",
+							for (String[] str : Errors)
+								try {									
+									textArea.getDocument().insertString(textArea.getDocument().getLength(), str[1] + "\n",
 											null);
 								} catch (BadLocationException e1) {
 									textArea.setText(e1.getMessage());
 								}
 						} else {
 							textArea.setText("");
-							textArea.setText("Ошибки не обнаруженны");
+							textArea.setText("РћС€РёР±РєРё РЅРµ РѕР±РЅР°СЂСѓР¶РµРЅРЅС‹");
 						}
 					} else {
-						textArea.setText("В файле отсутствует слобец " + selected);
+						textArea.setText("Р’ С„Р°Р№Р»Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ СЃР»РѕР±РµС† " + selected);
 					}
 
 				} catch (ParserConfigurationException e2) {

@@ -3,15 +3,16 @@ import java.util.ArrayList;
 
 /**
   * 
-  * Интерфейс модуля отвечающего за верификацию аккаунта
+  * РРЅС‚РµСЂС„РµР№СЃ РјРѕРґСѓР»СЏ РѕС‚РІРµС‡Р°СЋС‰РµРіРѕ Р·Р° РІРµСЂРёС„РёРєР°С†РёСЋ Р°РєРєР°СѓРЅС‚Р°
   *
   */
 public interface IVerificator {
 	/**
 	 * 
-	 * @param column проверяемые поля аккаунтов
-	 * @param data название проверяемого поля
-	 * @return cписок найденых ошибок
+	 * @param column РїСЂРѕРІРµСЂСЏРµРјС‹Рµ РїРѕР»СЏ Р°РєРєР°СѓРЅС‚РѕРІ
+	 * @param data РЅР°Р·РІР°РЅРёРµ РїСЂРѕРІРµСЂСЏРµРјРѕРіРѕ РїРѕР»СЏ
+	 * @return cРїРёСЃРѕРє РЅР°Р№РґРµРЅС‹С… РѕС€РёР±РѕРє
+	 * @throws SpecificationException 
 	 */
-	public ArrayList<String> Verificate(String column,ArrayList<String> data);
+	public ArrayList<String[]> Verificate(String column,ArrayList<String> data) throws SpecificationException;
 }
